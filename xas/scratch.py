@@ -2098,3 +2098,31 @@ def constant_exposure(name: str, comment: str, dwell_time: int = 1, number_of_ex
 
 
 
+
+
+
+#########################################
+###########################################
+
+
+from xas.db_io import load_apb_dataset_from_db, translate_apb_dataset, load_apb_trig_dataset_from_db, \
+    load_xs3_dataset_from_db, load_xs3_dataset_from_db_new, load_xs3x_dataset_from_db
+
+from xas.process import load_apb_dataset_from_db, translate_apb_dataset, load_apb_trig_dataset_from_db, load_xs3_dataset_from_db, interpolate, issrebin
+
+raw = {}
+for uid in list(np.arange(-1, -5, -1)):
+    uid = int(uid)
+    apb_df, energy_df, energy_offset = load_apb_dataset_from_db(db, uid)
+    raw_df = translate_apb_dataset(apb_df, energy_df, energy_offset)
+
+    apb_trig_timestamps = load_apb_trig_dataset_from_db(db, uid)
+    xs3_dict = load_xs3x_dataset_from_db(db, uid, apb_trig_timestamps)
+    key_base = 'CHAN1ROI1'
+
+    raw_df = {**raw_df, **xs3_dict}
+    raw[uid] = raw_df
+
+plt.figure()
+for value in raw.values():
+    plt.plot(value['CHAN1ROI1']['timestamp'] - value['CHAN1ROI1']['timestamp'][0], value['CHAN1ROI1']['CHAN1ROI1'])

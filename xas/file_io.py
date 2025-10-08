@@ -104,12 +104,13 @@ def validate_file_exists(path_to_file,file_type = 'interp'):
         prefix = 'r'
     elif file_type == 'bin':
         prefix = 'b'
+    elif file_type == 'dat':
+        prefix = 'd'
     if os.path.isfile(path_to_file):
         (path, extension) = os.path.splitext(path_to_file)
         iterator = 2
 
         while True:
-
             new_filename = '{}-{}{:04d}{}'.format(path, prefix, iterator,extension)
             if not os.path.isfile(new_filename):
                 return new_filename

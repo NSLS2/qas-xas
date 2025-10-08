@@ -5,6 +5,22 @@ from itertools import product
 from copy import deepcopy
 import time as ttime
 
+def load_general_scans_from_db(db, uid):
+    hdr = db[uid]
+    dictionary = {}
+    if hdr.start['detectors'][0] == 'apb_ave':
+        t = hdr.table()
+
+        motor = hdr.start['motors'][0]
+        dictionary[motor] = t[motor]
+        for i in range(1, 9):
+            key = f'apb_ave_ch{i}_mean'
+            dictionary[key] = np.array(t[key])
+
+    return dictionary
+
+
+
 
 def load_apb_dataset_from_db(db, uid):
     print(f'READING DATABROKER - {ttime.time()}')
@@ -17,7 +33,7 @@ def load_apb_dataset_from_db(db, uid):
     # apb_dataset = list(hdr.data(stream_name='apb_stream', field='apb_stream'))[0]
     energy_dataset =  list(hdr.data(stream_name='pb1_enc1',field='pb1_enc1'))[0]
     if not isinstance(energy_dataset, pd.DataFrame):
-        energy_dataset = pd.DataFrame(energy_dataset)
+        energy_dataset = pd.DataFrame(energy_dataset, dtype=np.float64)
     else:
         pass
     angle_offset = -float(hdr['start']['angle_offset'])
@@ -28,7 +44,7 @@ def load_apb_dataset_from_db(db, uid):
     ch_gains = get_ch_properties(hdr.start, 'ch', '_amp_gain')
 
     if not isinstance(apb_dataset, pd.DataFrame):
-        apb_dataset = pd.DataFrame(apb_dataset)
+        apb_dataset = pd.DataFrame(apb_dataset, dtype=np.float64)
     else:
         pass
 
@@ -55,15 +71,17 @@ def translate_apb_dataset(apb_dataset, energy_dataset, angle_offset,):
             adc['adc'] = apb_dataset[column]
 
             data_dict[column]=adc
-
+    # breakpoint()
     energy = pd.DataFrame()
-    energy['timestamp'] = energy_dataset['timestamp']
+    if 'timestamp' in energy_dataset:
+        energy['timestamp'] = energy_dataset['timestamp']
+    else:
+        energy['timestamp'] = energy_dataset['ts_s'] + energy_dataset['ts_ns']*1e-9
     enc  = energy_dataset['encoder'].apply(lambda x: int(x) if int(x) <= 0 else -(int(x) ^ 0xffffff - 1))
-
-
     energy['encoder'] = xray.encoder2energy(enc, 26222.222222222223, angle_offset)
 
     data_dict['energy'] = energy
+    # breakpoint()
     return data_dict
 
 

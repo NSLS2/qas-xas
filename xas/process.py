@@ -97,6 +97,9 @@ def process_interpolate_bin_from_uid(uid, db, e0=None):
         # except:
         #     logger.info(f'Loading file failed for UID {uid}/{path_to_file}')
         try:
+            print("Cleaning zeroes from timestamp")
+            raw_df = clean_dict(raw_df)
+            print("Now interpolating with", key_base)
             interpolated_df = interpolate(raw_df, key_base=key_base)
             logger.info(f'Interpolation successful for {path_to_file}')
             save_interpolated_df_as_file(path_to_file, interpolated_df, comments)
@@ -175,10 +178,15 @@ def process_interpolate_bin(doc, db, draw_func_interp = None, draw_func_binnned 
 
                 raw_df = {**raw_df, **xs3_dict}
                 key_base = 'CHAN1ROI1'
+
+
             logger.info(f'Loading file successful for UID {uid}/{path_to_file}')
             # except:
             #     logger.info(f'Loading file failed for UID {uid}/{path_to_file}')
             try:
+                print("Cleaning zeroes from timestamp")
+                raw_df = clean_dict(raw_df)
+                print("Now interpolating with", key_base)
                 interpolated_df = interpolate(raw_df, key_base = key_base)
                 logger.info(f'Interpolation successful for {path_to_file}')
                 save_interpolated_df_as_file(path_to_file, interpolated_df, comments)
@@ -211,6 +219,8 @@ def process_interpolate_bin(doc, db, draw_func_interp = None, draw_func_binnned 
                 logger.info(f'Binning failed for {path_to_file}')
                 print(e)
                 pass
+        elif experiment == 'general_scan':
+            pass
         elif experiment.startswith('diffraction'):
             pass
 
@@ -218,6 +228,8 @@ def process_interpolate_only(doc, db):
     if 'experiment' in db[doc['run_start']].start.keys():
         if db[doc['run_start']].start['experiment'] == 'fly_energy_scan':
             raw_df = load_dataset_from_files(db, doc['run_start'])
+            print("Cleaning zeroes from timestamp")
+            raw_df = clean_dict(raw_df)
             interpolated_df = interpolate(raw_df)
             return interpolated_df
 
@@ -267,6 +279,9 @@ def process_interpolate_bin_new(doc, db, draw_func_interp = None, draw_func_binn
             # except:
             #     logger.info(f'Loading file failed for UID {uid}/{path_to_file}')
             try:
+                print("Cleaning zeroes from timestamp")
+                raw_df = clean_dict(raw_df)
+                print("Now interpolating with", key_base)
                 if load_mca:
                     interpolated_df = interpolate_with_interp(raw_df, key_base = key_base)
                 else:
