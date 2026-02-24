@@ -12,6 +12,8 @@ import time as ttime
 from pexpect import pxssh
 from ftplib import FTP
 
+from scipy.integrate import cumulative_trapezoid as cumtrapz
+
 from . import xray
 import pandas as pd
 
@@ -27,6 +29,7 @@ class trajectory():
               dsine_postedge_duration = 20, vel_edge = 10):
 
         self.servocycle=servocycle
+        # cumtrapz = scipy.integrate.cumtrapz
         if trajectory_type == 'Step':
             preedge_lo = edge_energy+offsets[0]
             preedge_hi = edge_energy+offsets[1]
@@ -139,11 +142,11 @@ class trajectory():
                 factor = (max(accel1_1) - (vel_edge * (time_int[1] - time_int[0]))) / max(accel1_1)
                 accel1_2 = -factor * m_factor * (preedge_hi - preedge_lo) * (np.sin(x1) + 1) / 1000
 
-                vel1_1 = scipy.integrate.cumtrapz(accel1_1 * (1 / (x1_num/2)), initial = 0)
-                vel1_2 = scipy.integrate.cumtrapz(accel1_2 * (1 / (x1_num/2)), initial = 0) + vel1_1[-1]
+                vel1_1 = cumtrapz(accel1_1 * (1 / (x1_num / 2)), initial = 0)
+                vel1_2 = cumtrapz(accel1_2 * (1 / (x1_num / 2)), initial = 0) + vel1_1[-1]
 
                 vel1 = np.concatenate((vel1_1, vel1_2))
-                pos1 = scipy.integrate.cumtrapz(vel1, initial = 0) + preedge_lo
+                pos1 = cumtrapz(vel1, initial = 0) + preedge_lo
                 #print("1:", abs((pos1[-1] - pos1[0]) - (preedge_hi - preedge_lo)), m_factor)
                 error = abs((pos1[-1] - pos1[0]) - (preedge_hi - preedge_lo))
                 if(error > last_error):
@@ -152,7 +155,7 @@ class trajectory():
                 last_error = error
 
             vel_int = np.array([np.diff(time_int)[0]/np.diff(time1)[0] * vel1_2[-1]] * xedge_num * 2)
-            pos_int = scipy.integrate.cumtrapz(vel_int, initial = 0) + pos1[-1] + (pos1[-1] - pos1[-2])
+            pos_int = cumtrapz(vel_int, initial = 0) + pos1[-1] + (pos1[-1] - pos1[-2])
 
             m_factor = 1
             m_factor_der = 0.005
@@ -164,10 +167,10 @@ class trajectory():
                 accel2_2 = - acc_factor * (((vel_int[0] * len(acc_factor) / 2) + sum(acc_factor)) / sum(acc_factor))
 
                 time_adj = np.diff(time2)[0]/np.diff(time_int)[0]
-                vel2_1 = scipy.integrate.cumtrapz(accel2_1 * (1 / (x2_num/2)), initial = 0) + time_adj * vel_int[-1]
-                vel2_2 = scipy.integrate.cumtrapz(accel2_2 * (1 / (x2_num/2)), initial = 0) + vel2_1[-1]
+                vel2_1 = cumtrapz(accel2_1 * (1 / (x2_num / 2)), initial = 0) + time_adj * vel_int[-1]
+                vel2_2 = cumtrapz(accel2_2 * (1 / (x2_num / 2)), initial = 0) + vel2_1[-1]
                 vel2 = np.concatenate((vel2_1, vel2_2))
-                pos2 = scipy.integrate.cumtrapz(vel2, initial = 0) + pos_int[-1] + (pos_int[-1] - pos_int[-2])
+                pos2 = cumtrapz(vel2, initial = 0) + pos_int[-1] + (pos_int[-1] - pos_int[-2])
                 error = abs((pos2[-1] - pos2[0]) - (postedge_hi - postedge_lo))
                 if(error > last_error):
                     m_factor_der = -(m_factor_der / 2)
@@ -193,12 +196,12 @@ class trajectory():
             accel1 = np.concatenate((accel1, -accel1))
             accel2 = np.concatenate((accel2, -accel2))
 
-            vel1 = scipy.integrate.cumtrapz(accel1 * (1 / x1_num), initial = 0)
-            vel2 = scipy.integrate.cumtrapz(accel2 * (1 / x2_num), initial = 0)
+            vel1 = cumtrapz(accel1 * (1 / x1_num), initial = 0)
+            vel2 = cumtrapz(accel2 * (1 / x2_num), initial = 0)
 
-            pos1 = scipy.integrate.cumtrapz(vel1 * (1 / x1_num), initial = 0) + preedge_lo
+            pos1 = cumtrapz(vel1 * (1 / x1_num), initial = 0) + preedge_lo
             pos1 = (pos1 / pos1[len(pos1) - 1]) * edge
-            pos2 = scipy.integrate.cumtrapz(vel2 * (1 / x2_num), initial = 0) + edge
+            pos2 = cumtrapz(vel2 * (1 / x2_num), initial = 0) + edge
 
             self.energy = np.concatenate((pos1, pos2))
 
@@ -305,8 +308,9 @@ class trajectory_manager():
         name = orig_file_name
         header = self.read_header('{}{}'.format(orig_file_path, orig_file_name))
         if is_energy:
-            min_energy = int(np.round(traj).min())
-            max_energy = int(np.round(traj).max())
+            # print(type(traj), traj)
+            min_energy = int(np.round(traj.to_numpy()).min())
+            max_energy = int(np.round(traj.to_numpy()).max())
             enc = np.int64(np.round(xray.energy2encoder(-traj, self.hhm.pulses_per_deg, -offset)))
             orig_file_name = '.energy_traj_aux.txt'
             np.savetxt('{}{}'.format(orig_file_path, orig_file_name), enc, fmt='%d', header=header, comments='')
