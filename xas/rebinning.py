@@ -36,7 +36,6 @@ def xas_energy_grid(energy_range, e0, edge_start, edge_end, preedge_spacing, xan
 
     # before_edge = np.arange(e0+edge_start,e0 + edge_start+7, 1)
     before_edge = preedge[-1] + get_transition_grid(preedge_spacing, xanes_spacing, E_range_before, round_up=False)
-
     edge = np.arange(before_edge[-1], e0+edge_end-E_range_after, xanes_spacing)
 
     # after_edge = np.arange(e0 + edge_end - 7, e0 + edge_end, 0.7)
