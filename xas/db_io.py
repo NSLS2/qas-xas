@@ -45,7 +45,7 @@ def load_apb_dataset_from_tiled(tiled_client):
     print(f'LOADING APB DATA FROM TILED - {ttime.time()}')
 
     apb_stream_name = 'apb_stream' if tiled_client.start['hutch'] == 'b' else 'apb_stream_c'
-    apb_dataset = pd.DataFrame(tiled_client[f'{apb_stream_name}/{apb_stream_name}'].read().ravel())
+    apb_dataset = pd.DataFrame(tiled_client[f'{apb_stream_name}/data/{apb_stream_name}'].read().ravel())
 
     energy_dataset = pd.DataFrame(tiled_client['pb1_enc1/pb1_enc1'].read().ravel())
     angle_offset = -float(tiled_client.start['angle_offset'])
