@@ -39,7 +39,6 @@ import os
 from pathlib import Path
 
 
-
 def clean_dict(raw_dict):
     clean_raw_dict = {}
     for key in raw_dict.keys():
@@ -137,7 +136,7 @@ def process_interpolate_bin_from_uid(uid, db, e0=None):
             table_client = client.create_appendable_table(
                 schema=table.schema,
                 metadata=new_md,
-                access_tags=["lightshow_project"],
+                access_tags=hdr.access_tags,
             )
             table_client.append_partition(0, table)
             # client.write_table(
@@ -432,7 +431,9 @@ def find_key_base(tiled_client):
         )
 
 
-def process_interpolate_bin_with_tiled(tiled_client, tiled_writing_client, draw_func_interp=None, e0=None):
+def process_interpolate_bin_with_tiled(
+    tiled_client, tiled_writing_client, draw_func_interp=None, e0=None
+):
     logger = get_logger()
     print("SLEEPING")
     sleep(10)
@@ -465,7 +466,7 @@ def process_interpolate_bin_with_tiled(tiled_client, tiled_writing_client, draw_
             "xdi": generate_xdi_metadata(tiled_client),
             "interp_filename": path_to_file,
         }
-        
+
         # Change to "write appendable"
         table = pyarrow.Table.from_pandas(interpolated_df, preserve_index=False)
         table_client = tiled_writing_client.create_appendable_table(
@@ -508,7 +509,7 @@ def process_interpolate_bin_with_tiled(tiled_client, tiled_writing_client, draw_
             else:
                 save_binned_df_as_file(path_to_file, binned_df, comments, reorder=False)
             if draw_func_interp is not None:
-               draw_func_interp(interpolated_df)
+                draw_func_interp(interpolated_df)
 
         else:
             print("Energy E0 is not defined")
