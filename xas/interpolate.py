@@ -4,8 +4,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 
-
-def interpolate(dataset,key_base = 'i0'):
+def interpolate(dataset, key_base = 'i0'):
     interpolated_dataset = {}
     min_timestamp = max([dataset.get(key).iloc[0, 0] for key in dataset])
     max_timestamp = min([dataset.get(key).iloc[len(dataset.get(key)) - 1, 0] for key in
