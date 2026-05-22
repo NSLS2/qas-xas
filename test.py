@@ -25,7 +25,7 @@ def test():
     # process_interpolate_bin_from_uid(uid, db)
 
     print(client.context)
-    process_interpolate_bin_with_tiled(client[f"qas/raw/{uid}"], client["tst/sandbox/qas/processed"])
+    process_interpolate_bin_with_tiled(client[f"qas/migration/{uid}"], client["tst/sandbox/qas/processed"])
 
     # TEST READING
     # "Read the processed data back from tiled with the method isstools uses"
