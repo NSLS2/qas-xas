@@ -6,9 +6,12 @@ from xas.process import process_interpolate_bin_from_uid, process_interpolate_bi
 
 
 # test uid provided by Lu Ma on Februrary 18
-#uid = "187caec7-f260-4b10-8e0e-ed43e538afc2"    # fly_energy_scan_apb
-uid = "ae446a58-bb9c-4ff8-8675-30c6e7067131"    # fly_energy_scan_xs3x
-#uid = "76ed1151-7036-4eb2-a5b1-ae2d406eefaa" #Test Lightshow Demo
+# uid = "187caec7-f260-4b10-8e0e-ed43e538afc2"    # fly_energy_scan_apb
+#uid = "ae446a58-bb9c-4ff8-8675-30c6e7067131"    # fly_energy_scan_xs3x
+uid = "76ed1151-7036-4eb2-a5b1-ae2d406eefaa" #Test Lightshow Demo
+# uid = "6812120c-d7ff-46cc-bb0c-6d0e175607a7" # New Xpress3X Error
+# uid = "32b2d52f-513a-4392-83e1-7d0a7d612bab" # New APB error
+
 
 # Create tiled client objects
 client = from_uri("https://tiled.nsls2.bnl.gov")

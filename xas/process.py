@@ -452,13 +452,12 @@ def process_interpolate_bin_with_tiled(
 
         raw_df = load_flyscan_dataset(tiled_client)
         key_base = find_key_base(tiled_client)
-
         logger.info(f"Loading file successful for UID {uid}/{path_to_file}")
 
         ### Run Interpolation
         # try:
-        interpolated_df = interpolate(raw_df, key_base=key_base)
-
+        raw_dict = clean_dict(raw_df)
+        interpolated_df = interpolate(raw_dict, key_base=key_base)
         logger.info(f"Interpolation successful for {path_to_file}")
 
         ### This needs to be moved outside ###
