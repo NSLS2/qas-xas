@@ -467,11 +467,12 @@ def process_interpolate_bin_with_tiled(
         }
 
         # Change to "write appendable"
+        access_tags = tiled_client.access_blob['tags'] + ["qas_processed"]
         table = pyarrow.Table.from_pandas(interpolated_df, preserve_index=False)
         table_client = tiled_writing_client.create_appendable_table(
             schema=table.schema,
             metadata=new_md,
-            access_tags=["lightshow_project"],
+            access_tags=access_tags,
         )
         table_client.append_partition(0, table)
         # client.write_table(
