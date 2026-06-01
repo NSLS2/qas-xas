@@ -8563,8 +8563,10 @@ packages:
   timestamp: 1771083999178
 - pypi: .
   name: xas
-  version: 0.post55.dev0+ge947f5c
-  sha256: 12e972dce3b86f1200480f84ecd29a5b0dff210353f2bcb99962f05e64e1031b
+  version: 0.post81.dev0+g2012502
+  sha256: e6f8e2ec7d2226f89881b53542824c12f4e4cc32660dea14af655eb10103972a
+  requires_dist:
+  - scipy>=1.17.1,<2
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/xcb-util-0.4.1-h4f16b4b_2.conda
   sha256: ad8cab7e07e2af268449c2ce855cbb51f43f4664936eff679b1f3862e6e4b01d
