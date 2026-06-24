@@ -396,7 +396,7 @@ def load_flyscan_dataset(tiled_client):
 
     elif experiment == "fly_energy_scan_xs3":
         raise NotImplementedError(
-            "Need to update and test the `load_xs3_dataset_from_tiled` function."
+            "No plans for future use, if processing legacy data use original methods."
         )
 
         apb_df, energy_df, energy_offset = load_apb_dataset_from_tiled(tiled_client)

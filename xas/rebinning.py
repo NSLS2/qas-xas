@@ -63,8 +63,9 @@ def _generate_convolution_bin_matrix(sample_points, data_x):
     mat = _generate_sampled_gauss_window(data_x.reshape(1, -1),
                                         fwhm.reshape(-1, 1),
                                         sample_points.reshape(-1, 1))
-    mat *= delta_en.reshape(1, -1)
-    mat /= np.sum(mat, axis=1)[:, None]
+    mat = mat * delta_en.reshape(1, -1)
+    row_sums = np.sum(mat, axis=1)[:, None]
+    mat = mat / row_sums
     return mat
 
 

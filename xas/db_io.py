@@ -110,7 +110,7 @@ def load_xs3x_dataset_from_tiled(tiled_client, apb_trig_timestamps):
     # NOTE: tempoarily limit the number of spectra for testing
     # !!!!!!!! REMOVE THIS IN PRODUCTION !!!!!!!
     # See below for another line to uncomment in production
-    n_spectra = min(7, n_spectra)
+    # n_spectra = min(7, n_spectra)
 
     xs_timestamps = apb_trig_timestamps[:n_spectra]
 
