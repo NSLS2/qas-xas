@@ -34,6 +34,7 @@ from .xs3 import load_data_with_xs3
 from datetime import datetime
 from xas.metadata import generate_xdi_metadata
 from tiled.client import from_uri
+from tiled.queries import FullText
 import pyarrow
 import os
 from pathlib import Path
@@ -527,7 +528,7 @@ def process_interpolate_bin_with_tiled(
         pass
 
 
-def display_interpolate_bin_with_tiled(tiled_client, draw_function):
+def display_interpolate_bin_with_tiled(tiled_client, uid, draw_function):
     """Retrieve a previously processed interpolated dataset from Tiled by its raw
     scan uid and pass it to *draw_function* without performing any reprocessing.
 
@@ -539,9 +540,7 @@ def display_interpolate_bin_with_tiled(tiled_client, draw_function):
     Parameters
     ----------
     tiled_client:
-        A Tiled container client pointing at a specific UID for processed data.
-        This will not work with a large container, UID must be selected prior
-        in the path.
+        A Tiled container client pointing at collection containing the record.
     draw_function : callable or None
         Callback that accepts a single pandas DataFrame argument — the
         interpolated dataset — and renders it.  Matches the signature
@@ -549,16 +548,16 @@ def display_interpolate_bin_with_tiled(tiled_client, draw_function):
         qas-isstools.  If ``None`` the function is a no-op after retrieval.
     """
     tiled_client.refresh()
-    uid = tiled_client.metadata["xdi"]["Scan.uid"]
-
+    # TODO: Tiled has a problem combining `.` separators in queries
+    # XDI contains these in their properties e.g. `xdi.Scan.uid`
+    # so we have to use a full-text search for now which isn't as precise
     logger = get_logger()
 
-    uid = None
     try:
-        uid = tiled_client.metadata["xdi"]["Scan.uid"]
+        scan = tiled_client.search(FullText(uid))
     except (KeyError, TypeError) as e:
         logger.error(
-            f"Failed to retrieve UID: container does not have valid xdi metadata. Error: {e}"
+            f"Failed to retrieve tiled container using FullText. Error: {e}"
         )
         raise ValueError(
             "Container does not have valid xdi metadata with 'Scan.uid' field"
@@ -567,7 +566,7 @@ def display_interpolate_bin_with_tiled(tiled_client, draw_function):
     logger.info(f"Retrieving processed interpolated data {uid}")
 
     try:
-        interpolated_df = tiled_client.read()
+        interpolated_df = scan.read()
     except Exception:
         logger.info(f"No processed dataset found for uid {uid}")
         return
