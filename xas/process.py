@@ -528,6 +528,74 @@ def process_interpolate_bin_with_tiled(
         pass
 
 
+def process_interpolate_locally(tiled_client, draw_func_interp=None, e0=None):
+    logger = get_logger()
+    print("SLEEPING")
+    sleep(10)
+    tiled_client.refresh()
+    experiment = tiled_client.start["experiment"]
+    uid = tiled_client.start["uid"]
+
+    if experiment.startswith("fly"):
+        path_to_file = tiled_client.start["interp_filename"]
+        print(f">>>Path to file {path_to_file}")
+
+        if e0 is None:
+            e0 = float(tiled_client.start.get("e0", -1))
+
+        comments = create_file_header_tiled(tiled_client)
+
+        raw_df = load_flyscan_dataset(tiled_client)
+        key_base = find_key_base(tiled_client)
+        logger.info(f"Loading file successful for UID {uid}/{path_to_file}")
+
+        ### Run Interpolation
+        # try:
+        raw_dict = clean_dict(raw_df)
+        interpolated_df = interpolate(raw_dict, key_base=key_base)
+        logger.info(f"Interpolation successful for {path_to_file}")
+
+        ###########
+
+        # except:
+        # logger.info(f"Interpolation failed for {path_to_file}")
+        # # Enable this if you change filepath to a local one
+        # try:
+
+        ### Run Binning
+        if e0 > 0:
+            print("Inside xas process try draw (e0 > 0) start time: ", datetime.now())
+            # binned_df = rebin(interpolated_df, e0)
+            binned_df = issrebin(interpolated_df, e0)
+
+            if os.getenv("TEST") == "1":
+                path_to_file = str(Path(__file__).parent / Path(path_to_file).name)
+
+            logger.info(f"Binning successful for {path_to_file}")
+            if experiment == "fly_energy_scan_apb":
+                # save_binned_df_as_file(path_to_file, binned_df, comments, reorder=True)
+                print("Saved to TILED")
+            elif experiment == "fly_energy_scan_xs3":
+                binned_df = average_roi_channels(binned_df)
+                save_binned_df_as_file(path_to_file, binned_df, comments, reorder=True)
+            elif experiment == "fly_energy_scan_xs3x":
+                binned_df = average_roi_channels_xs3x(binned_df)
+                save_binned_df_as_file(path_to_file, binned_df, comments, reorder=True)
+            else:
+                save_binned_df_as_file(path_to_file, binned_df, comments, reorder=False)
+            if draw_func_interp is not None:
+                draw_func_interp(interpolated_df)
+
+        else:
+            print("Energy E0 is not defined")
+            # except Exception as e:
+            #     logger.info(f"Binning failed for {path_to_file}")
+            #     print(e)
+            # pass
+    elif experiment.startswith("diffraction"):
+        pass
+
+
 def display_interpolate_bin_with_tiled(tiled_client, uid, draw_function):
     """Retrieve a previously processed interpolated dataset from Tiled by its raw
     scan uid and pass it to *draw_function* without performing any reprocessing.
@@ -556,9 +624,7 @@ def display_interpolate_bin_with_tiled(tiled_client, uid, draw_function):
     try:
         scan = tiled_client.search(FullText(uid))
     except (KeyError, TypeError) as e:
-        logger.error(
-            f"Failed to retrieve tiled container using FullText. Error: {e}"
-        )
+        logger.error(f"Failed to retrieve tiled container using FullText. Error: {e}")
         raise ValueError(
             "Container does not have valid xdi metadata with 'Scan.uid' field"
         ) from e
