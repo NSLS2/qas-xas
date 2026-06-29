@@ -124,8 +124,8 @@ def load_xs3x_dataset_from_tiled(tiled_client, apb_trig_timestamps):
             r_min = roi_stream[f'xsx_stream_channel{chn:02d}_mcaroi{roin:02d}_min_x'].values[1]
             r_size = roi_stream[f'xsx_stream_channel{chn:02d}_mcaroi{roin:02d}_size_x'].values[1] or 1
 
-            r_spectrum = np.sum(arr[:n_spectra, chn-1, r_min:r_min+r_size], axis=1)    # REMOVE THIS LINE IN PRODUCTION; uncomment below
-            # r_spectrum = np.sum(arr[:, chn-1, r_min:r_min+r_size], axis=1)
+            #r_spectrum = np.sum(arr[:n_spectra, chn-1, r_min:r_min+r_size], axis=1)    # REMOVE THIS LINE IN PRODUCTION; uncomment below
+            r_spectrum = np.sum(arr[:, chn-1, r_min:r_min+r_size], axis=1)
             roi_name = f'CHAN{chn}ROI{roin}'
             spectra[roi_name] = pd.DataFrame(np.vstack((xs_timestamps, r_spectrum)).T, columns=['timestamp', roi_name])
 
@@ -159,8 +159,13 @@ def translate_apb_dataset(apb_dataset, energy_dataset, angle_offset,):
     data_dict= {}
 
     # Add each channel as a separate DataFrame to the data_dict
-    apb_timestamp = apb_dataset['ts_s'] + apb_dataset['ts_ns'] / 1e9
-    for column in set(apb_dataset.columns).difference({'ts_s', 'ts_ns'}):
+    if 'timestamp' in apb_dataset.columns:
+        apb_timestamp = apb_dataset['timestamp']
+        apb_non_ts_cols = set(apb_dataset.columns).difference({'timestamp'})
+    else:
+        apb_timestamp = apb_dataset['ts_s'] + apb_dataset['ts_ns'] / 1e9
+        apb_non_ts_cols = set(apb_dataset.columns).difference({'ts_s', 'ts_ns'})
+    for column in apb_non_ts_cols:
         data_dict[column]=pd.DataFrame({"timestamp": apb_timestamp,
                                               "adc": apb_dataset[column]})
 
