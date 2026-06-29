@@ -437,7 +437,7 @@ def process_interpolate_bin_with_tiled(
 ):
     logger = get_logger()
     print("SLEEPING")
-    sleep(10)
+    sleep(5)
     tiled_client.refresh()
     experiment = tiled_client.start["experiment"]
     uid = tiled_client.start["uid"]
@@ -531,7 +531,7 @@ def process_interpolate_bin_with_tiled(
 def process_interpolate_locally(tiled_client, draw_func_interp=None, e0=None):
     logger = get_logger()
     print("SLEEPING")
-    sleep(10)
+    sleep(5)
     tiled_client.refresh()
     experiment = tiled_client.start["experiment"]
     uid = tiled_client.start["uid"]

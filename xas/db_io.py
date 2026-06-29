@@ -45,9 +45,9 @@ def load_apb_dataset_from_tiled(tiled_client):
     print(f'LOADING APB DATA FROM TILED - {ttime.time()}')
 
     apb_stream_name = 'apb_stream' if tiled_client.start['hutch'] == 'b' else 'apb_stream_c'
-    apb_dataset = pd.DataFrame(tiled_client.v2[apb_stream_name].read()[apb_stream_name].to_numpy().ravel())
+    apb_dataset = pd.DataFrame(tiled_client[apb_stream_name].read()[apb_stream_name].to_numpy().ravel())
 
-    energy_dataset = pd.DataFrame(tiled_client.v2['pb1_enc1'].read()['pb1_enc1'].to_numpy().ravel())
+    energy_dataset = pd.DataFrame(tiled_client['pb1_enc1'].read()['pb1_enc1'].to_numpy().ravel())
     angle_offset = -float(tiled_client.start['angle_offset'])
 
     ch_offsets = get_ch_properties(tiled_client.start, 'ch', '_offset')*1e3  # offsets are ib mV but the readings are in uV
@@ -64,7 +64,7 @@ def load_apb_dataset_from_tiled(tiled_client):
 
 def load_apb_trig_dataset_from_tiled(tiled_client, use_fall=True, stream_name='apb_trigger'):
 
-    data = tiled_client.v2[stream_name].read()[stream_name].to_numpy().ravel()
+    data = tiled_client[stream_name].read()[stream_name].to_numpy().ravel()
     timestamps = data['timestamp']
     transitions = data['transition']  # 0 or 1
 
@@ -81,13 +81,12 @@ def load_apb_trig_dataset_from_tiled(tiled_client, use_fall=True, stream_name='a
 def load_xs3_dataset_from_tiled(tiled_client, apb_trig_timestamps):
     # NOTE: not tested
 
-    arr = tiled_client.v2['xs_stream'].read()[ 'xs_stream'].to_numpy().ravel()
+    arr = tiled_client['xs_stream'].read()[ 'xs_stream'].to_numpy().ravel()
     n_spectra = arr.size
     xs_timestamps = apb_trig_timestamps[:n_spectra]
     chan_roi_names = [f'CHAN{c}ROI{r}' for c, r in product([1, 2, 3, 4, 6], [1, 2, 3, 4])]
     spectra = {}
 
-    breakpoint()
 
     for j, chan_roi in enumerate(chan_roi_names):
         this_spectrum = np.zeros(n_spectra)
@@ -103,7 +102,7 @@ def load_xs3_dataset_from_tiled(tiled_client, apb_trig_timestamps):
 def load_xs3x_dataset_from_tiled(tiled_client, apb_trig_timestamps):
     print("LOADING XS3X DATA FROM TILED - ", ttime.time())
 
-    arr = tiled_client['xsx_stream/xsx_stream']
+    arr = tiled_client['xsx_stream/xsx_stream'].read()
     roi_stream = tiled_client['baseline'].read()
     n_spectra = arr.shape[0]
 
