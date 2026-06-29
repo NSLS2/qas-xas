@@ -159,8 +159,9 @@ def translate_apb_dataset(apb_dataset, energy_dataset, angle_offset,):
     data_dict= {}
 
     # Add each channel as a separate DataFrame to the data_dict
-    for column in set(apb_dataset.columns).difference({'timestamp'}):
-        data_dict[column]=pd.DataFrame({"timestamp": apb_dataset['timestamp'],
+    apb_timestamp = apb_dataset['ts_s'] + apb_dataset['ts_ns'] / 1e9
+    for column in set(apb_dataset.columns).difference({'ts_s', 'ts_ns'}):
+        data_dict[column]=pd.DataFrame({"timestamp": apb_timestamp,
                                               "adc": apb_dataset[column]})
 
     # Translate encoder values to energy and add to the data_dict
