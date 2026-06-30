@@ -599,7 +599,7 @@ def read_header(filename):
 def save_binned_df_as_hdf5_file(path_to_file, df, comments, reorder=False):
     (path, extension) = os.path.splitext(path_to_file)
     path_to_file = path + '.dat'
-    path_to_file = validate_file_exists(path_to_file, file_type='bin')
+    # path_to_file = validate_file_exists(path_to_file, file_type='bin')
     cols = df.columns.tolist()
     sliced_df = df.drop(['ch_1', 'ch_2', 'ch_3', 'ch_4'], axis=1, inplace=False)
     sliced_cols = sliced_df.columns.tolist()
