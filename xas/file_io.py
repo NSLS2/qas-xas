@@ -324,6 +324,204 @@ def create_file_header(db,uid):
                   frontend_cm_xu, frontend_cm_xd)
     return  comments
 
+
+def create_file_header_tiled(tiled_client):
+    facility = tiled_client.start['Facility']
+    beamline = tiled_client.start['beamline_id']
+    pi = tiled_client.start['PI']
+    proposal = tiled_client.start['PROPOSAL']
+    saf = tiled_client.start['SAF']
+    comment = tiled_client.start['comment']
+    year = tiled_client.start['year']
+    cycle = tiled_client.start['cycle']
+    scan_id = tiled_client.start['scan_id']
+    real_uid = tiled_client.start['uid']
+    start_time = tiled_client.start['time']
+    stop_time = tiled_client.stop['time']
+    human_start_time = str(datetime.fromtimestamp(start_time).strftime('%m/%d/%Y  %H:%M:%S'))
+    human_stop_time = str(datetime.fromtimestamp(stop_time).strftime('%m/%d/%Y  %H:%M:%S'))
+    human_duration = str(datetime.fromtimestamp(stop_time - start_time).strftime('%M:%S'))
+
+    foil_e = tiled_client.start['foil_element']
+    foil_element = foil_e[0]
+
+    hutchB_ion_chamber_gain = tiled_client.start['keithley_gainsB']
+    hutchB_i0_gain = hutchB_ion_chamber_gain[0]
+    hutchB_it_gain = hutchB_ion_chamber_gain[1]
+    hutchB_ir_gain = hutchB_ion_chamber_gain[2]
+    hutchB_iff_gain = hutchB_ion_chamber_gain[3]
+
+    hutchB_ionchamber_GasRate = tiled_client.start['ionchamber_ratesB']
+    hutchB_ion_chamber_gas_i0_He = hutchB_ionchamber_GasRate[0]
+    hutchB_ion_chamber_gas_i0_N2 = hutchB_ionchamber_GasRate[1]
+    hutchB_ion_chamber_gas_i0_Ar = hutchB_ionchamber_GasRate[2]
+    hutchB_ion_chamber_gas_it_N2 = hutchB_ionchamber_GasRate[3]
+    hutchB_ion_chamber_gas_it_Ar = hutchB_ionchamber_GasRate[4]
+
+    hutchB_incpathPos = tiled_client.start['incident_beampathB']
+    hutchB_incpath_vertical = hutchB_incpathPos[0]
+
+    hutchB_slitsPos = tiled_client.start['incident_slits']
+    hutchB_slits_top      = hutchB_slitsPos[0]
+    hutchB_slits_bottom   = hutchB_slitsPos[1]
+    hutchB_slits_inboard  = hutchB_slitsPos[2]
+    hutchB_slits_outboard = hutchB_slitsPos[3]
+
+    hutchB_samplestagePos = tiled_client.start['sample_stageB']
+    hutchB_samplestage_rot = hutchB_samplestagePos[0]
+    hutchB_samplestage_x   = hutchB_samplestagePos[1]
+    hutchB_samplestage_y   = hutchB_samplestagePos[2]
+    hutchB_samplestage_z   = hutchB_samplestagePos[3]
+
+    # pe_verticalPos = tiled_client.start['pe_vertical']
+    # pe_vertical = pe_verticalPos[0]
+
+    cm_horizontalPos = tiled_client.start['cm_horizontal']
+    frontend_cm_xu = cm_horizontalPos[0]
+    frontend_cm_xd = cm_horizontalPos[1]
+
+    if 'trajectory_name' in tiled_client.start:
+        trajectory_name = tiled_client.start['trajectory_name']
+    else:
+        trajectory_name = ''
+
+    if 'element' in tiled_client.start:
+        element = tiled_client.start['element']
+    else:
+        element = ''
+
+    if 'edge' in tiled_client.start:
+        edge = tiled_client.start['edge']
+    else:
+        edge = ''
+
+    if 'e0' in tiled_client.start:
+        e0 = tiled_client.start['e0']
+    else:
+        e0 = ''
+
+    if 'linkam_temperature' in tiled_client.start:
+        linkam_T = tiled_client.start['linkam_temperature'][0]
+        linkam_RR = tiled_client.start['linkam_temperature'][1]
+    else:
+        linkam_T = 0
+        linkam_RR = 0
+
+    hutchC_ion_chamber_gain = tiled_client.start['keithley_gainsC']
+    hutchC_i0_gain = hutchC_ion_chamber_gain[0]
+    hutchC_it_gain = hutchC_ion_chamber_gain[1]
+    hutchC_ir_gain = hutchC_ion_chamber_gain[2]
+
+    hutchC_ionchamber_GasRate = tiled_client.start['ionchamber_ratesC']
+    hutchC_ion_chamber_gas_i0_He = hutchC_ionchamber_GasRate[0]
+    hutchC_ion_chamber_gas_i0_N2 = hutchC_ionchamber_GasRate[1]
+    hutchC_ion_chamber_gas_i0_Ar = hutchC_ionchamber_GasRate[2]
+    hutchC_ion_chamber_gas_it_N2 = hutchC_ionchamber_GasRate[3]
+    hutchC_ion_chamber_gas_it_Ar = hutchC_ionchamber_GasRate[4]
+
+    hutchC_incpathPos = tiled_client.start['incident_beampathC']
+    hutchC_incpath_vertical = hutchC_incpathPos[0]
+
+    hutchC_slitsPos = tiled_client.start['incident_slits_c']
+    hutchC_slits_top = hutchC_slitsPos[0]
+    hutchC_slits_bottom = hutchC_slitsPos[1]
+    hutchC_slits_inboard = hutchC_slitsPos[2]
+    hutchC_slits_outboard = hutchC_slitsPos[3]
+
+    hutchC_driftsTablePos = tiled_client.start['hutchC_table']
+    hutchC_drifts_table_hor_up = hutchC_driftsTablePos[0]
+    hutchC_drifts_table_hor_down = hutchC_driftsTablePos[1]
+    hutchC_drifts_table_vert_up_in = hutchC_driftsTablePos[2]
+    hutchC_drifts_table_vert_up_out = hutchC_driftsTablePos[3]
+    hutchC_drifts_table_vert_down = hutchC_driftsTablePos[4]
+
+
+    hutchC_driftsStagePos = tiled_client.start['drifts_stageC']
+    hutchC_drifts_z = hutchC_driftsStagePos[0]
+    hutchC_drifts_x = hutchC_driftsStagePos[1]
+
+    # hutchB_ionchamber_GasRate = tiled_client.start['ionchamber_ratesC']
+    # hutchB_ion_chamber_gas_i0_He = hutchB_ionchamber_GasRate[0]
+    # hutchB_ion_chamber_gas_i0_N2 = hutchB_ionchamber_GasRate[1]
+    # hutchB_ion_chamber_gas_i0_Ar = hutchB_ionchamber_GasRate[2]
+    # hutchB_ion_chamber_gas_it_N2 = hutchB_ionchamber_GasRate[3]
+    # hutchB_ion_chamber_gas_it_Ar = hutchB_ionchamber_GasRate[4]
+
+
+    comments =   '# Facility: {}\n'\
+                 '# Beamline: {}\n'\
+                 '# Year: {}\n' \
+                 '# Cycle: {}\n' \
+                 '# SAF: {}\n' \
+                 '# PI: {}\n'\
+                 '# Proposal: {}\n'\
+                 '# Scan ID: {}\n' \
+                 '# UID: {}\n'\
+                 '# Comment: {}\n' \
+                 '# Start time: {}\n' \
+                 '# Stop time: {}\n' \
+                 '# Total time: {}\n' \
+                 '# Trajectory name: {}\n'\
+                 '# Element: {}\n'\
+                 '# Edge: {}\n'\
+                 '# E0: {}\n'\
+                 '# Reference Foil Element: {}\n'\
+                 '# Keithley Gains I0: 1E{} V/A It: 1E{} V/A Iref: 1E{} V/A PIPS: 1E{} V/A \n'\
+                 '# Ion Chamber Gas Flow Rates: I0: {:.2f} sccm He + {:.2f} sccm N2 + {:.2f} sccm Ar \n'\
+                 '# Ion Chamber Gas Flow Rates: It&Iref: {:.2f} sccm N2 + {:.2f} sccm Ar\n'\
+                 '# Incident Beam Path Vertical: {:.2f} mm\n'\
+                 '# Incident Slits Positions B: TOP: {} mm Bottom: {} mm Inboard: {} mm Outboard: {} mm\n'\
+                 '# Sample Stage Positions: Rotation: {} deg Horizontal: {:.2f} mm Vertical: {:.2f} mm Beam Direction: {:.2f} mm\n'\
+                 '# PerkinElmer Vertical Position: {:.2f} mm\n'\
+                 '# Linkam Oven Temperature : {:.2f} C and Ramp Rate: {:.2f} C/min.\n' \
+                 '# Hutch C Keithley Gains I0: 1E{} V/A It: 1E{} V/A Iref: 1E{} V/A \n' \
+                 '# hutch C Ion Chamber Gas Flow Rates: I0: {:.2f} sccm He + {:.2f} sccm N2 + {:.2f} sccm Ar \n' \
+                 '# hutch C Ion Chamber Gas Flow Rates: It&Iref: {:.2f} sccm N2 + {:.2f} sccm Ar\n' \
+                 '# Incident Beam Path C Vertical: {:.2f} mm\n' \
+                 '# Incident Slits Positions C: TOP: {} mm Bottom: {} mm Inboard: {} mm Outboard: {} mm\n' \
+                 '# DRIFTS table in hutch C: Horizontal(up): {} mm Horizontal(down): {} mm\n' \
+                 '# DRIFTS table in hutch C: Vertical(up-in): {} mm Vertical(up-out): {} mm Vertical(down): {} mm\n' \
+                 '# DRIFTS stage in hutch C: Z (rotation): {} mm X: {} mm\n' \
+                 '# Front End Mirror Horizontal Positions: Up: {:.2f} mm Down: {:.2f} mm\n#\n# '.format(
+                  facility,
+                  beamline,
+                  year,
+                  cycle,
+                  saf,
+                  pi,
+                  proposal,
+                  scan_id,
+                  real_uid,
+                  comment,
+                  human_start_time,
+                  human_stop_time,
+                  human_duration,
+                  trajectory_name,
+                  element,
+                  edge,
+                  e0,
+                  foil_element,
+                  hutchB_i0_gain, hutchB_it_gain, hutchB_ir_gain, hutchB_iff_gain,
+                  hutchB_ion_chamber_gas_i0_He, hutchB_ion_chamber_gas_i0_N2, hutchB_ion_chamber_gas_i0_Ar,
+                  hutchB_ion_chamber_gas_it_N2, hutchB_ion_chamber_gas_it_Ar,
+                  hutchB_incpath_vertical,
+                  hutchB_slits_top, hutchB_slits_bottom, hutchB_slits_inboard, hutchB_slits_outboard,
+                  hutchB_samplestage_rot, hutchB_samplestage_x, hutchB_samplestage_y, hutchB_samplestage_z,
+                  350,
+                  # pe_vertical,
+                  linkam_T, linkam_RR,
+                  hutchC_i0_gain, hutchC_it_gain, hutchC_ir_gain,
+                  hutchC_ion_chamber_gas_i0_He, hutchC_ion_chamber_gas_i0_N2, hutchC_ion_chamber_gas_i0_Ar,
+                  hutchC_ion_chamber_gas_it_N2, hutchC_ion_chamber_gas_it_Ar,
+                  hutchC_incpath_vertical,
+                  hutchC_slits_top, hutchC_slits_bottom, hutchC_slits_inboard, hutchC_slits_outboard,
+                  hutchC_drifts_table_hor_up, hutchC_drifts_table_hor_down,
+                  hutchC_drifts_table_vert_up_in, hutchC_drifts_table_vert_up_out, hutchC_drifts_table_vert_down,
+                  hutchC_drifts_z, hutchC_drifts_x,
+                  frontend_cm_xu, frontend_cm_xd)
+    return  comments
+
+
 def find_e0(db, uid):
     e0 = -1
     if 'e0' in db[uid]['start']:

@@ -36,7 +36,6 @@ def xas_energy_grid(energy_range, e0, edge_start, edge_end, preedge_spacing, xan
 
     # before_edge = np.arange(e0+edge_start,e0 + edge_start+7, 1)
     before_edge = preedge[-1] + get_transition_grid(preedge_spacing, xanes_spacing, E_range_before, round_up=False)
-
     edge = np.arange(before_edge[-1], e0+edge_end-E_range_after, xanes_spacing)
 
     # after_edge = np.arange(e0 + edge_end - 7, e0 + edge_end, 0.7)
@@ -64,8 +63,9 @@ def _generate_convolution_bin_matrix(sample_points, data_x):
     mat = _generate_sampled_gauss_window(data_x.reshape(1, -1),
                                         fwhm.reshape(-1, 1),
                                         sample_points.reshape(-1, 1))
-    mat *= delta_en.reshape(1, -1)
-    mat /= np.sum(mat, axis=1)[:, None]
+    mat = mat * delta_en.reshape(1, -1)
+    row_sums = np.sum(mat, axis=1)[:, None]
+    mat = mat / row_sums
     return mat
 
 

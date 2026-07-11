@@ -1,10 +1,19 @@
 import logging
 import logging.handlers
+import os
+import tempfile
+from pathlib import Path
 
+if os.getenv("TEST"):
+    tempdir = tempfile.TemporaryDirectory()
+    SHARED_PATH = tempdir.name
+    Path(tempdir.name, "log").mkdir()
+else:
+    SHARED_PATH = '/nsls2/data/qas-new/shared'
 
 def get_logger():
     # Setup beamline specifics:
-    beamline_gpfs_path = '/nsls2/data/qas-new/shared'
+    beamline_gpfs_path = SHARED_PATH
 
     logger = logging.getLogger('xas_logger')
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')

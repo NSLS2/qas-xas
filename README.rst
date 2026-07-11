@@ -18,3 +18,8 @@ Features
 --------
 
 * TODO
+
+Testing
+--------
+
+Run the tiled writing test with ``pixi run test`` after ``pixi install`` completes.
